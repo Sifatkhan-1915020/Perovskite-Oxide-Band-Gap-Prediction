@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perovskite AI Predictor | Biomedical</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4facfe;
+            --secondary: #00f2fe;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --text-muted: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 650px; /* Widened slightly to accommodate 2 columns */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .header h2 {
+            color: var(--dark);
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        .intro-card {
+            background: #f0f7ff;
+            border-left: 4px solid var(--primary);
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        .intro-card strong {
+            color: var(--primary);
+        }
+
+        /* 2-Column Grid for the form */
+        #prediction-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 15px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.8rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 10px 10px 35px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            background: var(--light);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.15);
+        }
+
+        input:focus + i, input:focus ~ i {
+            color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 5px;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        button:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Section - Side by Side */
+        #result-container {
+            margin-top: 15px;
+            display: none;
+            gap: 15px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-box {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-box div:first-child {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* Dynamic Classes */
+        .bg-light-blue { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+        .bg-wide { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .bg-narrow { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        .bg-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Responsive Design for smaller screens */
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            #prediction-form { grid-template-columns: 1fr; gap: 10px; }
+            .full-width { grid-column: span 1; }
+            #result-container { flex-direction: column; gap: 10px; }
+            button { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2><i class="fa-solid fa-microscope" style="color: var(--primary);"></i> Perovskite Predictor</h2>
+    </div>
+
+    <div class="intro-card">
+        <i class="fa-solid fa-heart-pulse" style="color: var(--primary); margin-right: 5px;"></i>
+        <strong>Biomedical Impact:</strong> Accurate bandgap prediction of oxide perovskites accelerates the creation of sensitive <strong>X-ray detectors</strong>, advanced <strong>biosensors</strong>, and efficient photodetectors for vital-sign monitoring.
+    </div>
+
+    <form id="prediction-form">
+        <div class="form-group full-width">
+            <label>Chemical Formula</label>
+            <div class="input-wrapper">
+                <input type="text" id="formula" placeholder="e.g., SrTiO3" required>
+                <i class="fa-solid fa-flask"></i>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Volume (Å³)</label>
+            <div class="input-wrapper">
+                <input type="number" step="any" id="volume" placeholder="Crystal volume" required>
+                <i class="fa-solid fa-cube"></i>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Density (g/cm³)</label>
+            <div class="input-wrapper">
+                <input type="number" step="any" id="density" placeholder="Density" required>
+                <i class="fa-solid fa-weight-hanging"></i>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Form. Energy (eV/atom)</label>
+            <div class="input-wrapper">
+                <input type="number" step="any" id="formation_energy" placeholder="Formation energy" required>
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Energy Above Hull (eV)</label>
+            <div class="input-wrapper">
+                <input type="number" step="any" id="energy_above_hull" placeholder="Above hull" required>
+                <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+        </div>
+        
+        <button type="submit" id="submit-btn" class="full-width">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Band Gap
+        </button>
+    </form>
+
+    <div id="result-container">
+        <div id="reg-result" class="result-box bg-light-blue">
+            <div id="reg-label">Exact Value:</div>
+            <div class="result-value" id="reg-value">-- eV</div>
+        </div>
+        <div id="clf-result" class="result-box">
+            <div id="clf-label">Category:</div>
+            <div class="result-value" id="clf-value">--</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submit-btn');
+        const resultContainer = document.getElementById('result-container');
+        const regResult = document.getElementById('reg-result');
+        const clfResult = document.getElementById('clf-result');
+        const regValue = document.getElementById('reg-value');
+        const clfValue = document.getElementById('clf-value');
+        
+        // Update Button State
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing...';
+        btn.disabled = true;
+        resultContainer.style.display = 'none';
+        
+        // Reset labels
+        document.getElementById('reg-label').innerText = 'Exact Value:';
+        document.getElementById('clf-label').innerText = 'Category:';
+
+        const payload = {
+            formula: document.getElementById('formula').value,
+            volume: parseFloat(document.getElementById('volume').value),
+            density: parseFloat(document.getElementById('density').value),
+            formation_energy: parseFloat(document.getElementById('formation_energy').value),
+            energy_above_hull: parseFloat(document.getElementById('energy_above_hull').value)
+        };
+
+        try {
+            const response = await fetch('/api/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            // Set layout to flex so boxes appear side-by-side
+            resultContainer.style.display = 'flex';
+
+            if (response.ok) {
+                regResult.className = 'result-box bg-light-blue';
+                regValue.innerText = `${data.predicted_ev.toFixed(4)} eV`;
+
+                if (data.raw_class === 1) {
+                    clfResult.className = 'result-box bg-wide';
+                } else {
+                    clfResult.className = 'result-box bg-narrow';
+                }
+                clfValue.innerHTML = `<i class="fa-solid ${data.raw_class === 1 ? 'fa-up-right-and-down-left-from-center' : 'fa-down-left-and-up-right-to-center'}"></i> ${data.band_gap_class}`;
+
+            } else {
+                regResult.className = 'result-box bg-error';
+                document.getElementById('reg-label').innerText = 'System Alert:';
+                regValue.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Halted';
+                regValue.style.fontSize = '1.1rem';
+                
+                clfResult.className = 'result-box bg-error';
+                document.getElementById('clf-label').innerText = 'Reason:';
+                clfValue.innerText = data.detail || 'Failed to predict';
+                clfValue.style.fontSize = '0.9rem';
+            }
+        } catch (error) {
+            resultContainer.style.display = 'flex';
+            regResult.className = 'result-box bg-error';
+            document.getElementById('reg-label').innerText = 'Error:';
+            regValue.innerHTML = '<i class="fa-solid fa-wifi"></i> Network Error';
+            regValue.style.fontSize = '1rem';
+            
+            clfResult.className = 'result-box bg-error';
+            document.getElementById('clf-label').innerText = 'Reason:';
+            clfValue.innerText = 'Check API connection.';
+            clfValue.style.fontSize = '0.9rem';
+        } finally {
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Predict Band Gap';
+            btn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
